@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+
+    <title>Tempera Simulada (Simulated annealing)</title>
+  
+<script>
+
+/* Valores mínimos e máximos aceitos para os elementos */
+var min = -10, max = 10;
+
+function f(x){
+	var ret=0;qtJ=5;i=0,j=1;	
+	for (i=0;i<x.length;i++){
+		for(j=1;j<=qtJ;j++){
+			ret += j * Math.cos((j+1)*x[i] +j);
+		}		
+	}	
+	return ret;
+}
+
+function randomIntFromInterval(minimo, maximo, decimais) {  
+	var d = Math.pow(10, decimais);
+	var ret = Math.floor(((Math.random() * (maximo - minimo + 1) - Math.abs(minimo))) * d) / d;
+	if (ret > maximo) ret = maximo;
+	if (ret < minimo) ret = minimo;
+	return ret;
+}
+
+function rand(){	
+    return randomIntFromInterval(min, max, randomIntFromInterval(0, 10, 0));
+}
+
+/* S = Solução inicial */
+/* T = Valor inicial da tempera */
+/* fatorResfriamento = Fator de resfriamento da tempera valor entre 0 e 1 */
+/* equilibrioT = Nr. de interações para o sistema atingir o equilíbrio térmico da tempera */
+/* TEMPO = Tempo máximo de execução do algoritmo em segundos */
+function temperaSimulada(S, T, fatorResfriamento, equilibrioT, TEMPO){
+	/* Ótimo Local/Global */
+	var M = [...S];
+
+	var start = new Date().getTime();
+	do {	
+		var equilibrio = 0;			
+		while(equilibrio < equilibrioT){	
+			var Ss = false, N = [...S];			
+			
+			/* Gera um vizinho */ 	
+			N[randomIntFromInterval(0,(S.length - 1),0)] = rand();
+			
+			/*A cada geração de um novo vizinho s’ de s, é testada a variação ∆ do valor da função objetivo, isto é, ∆ = f (s’) – f (s), onde temos as seguintes situações:*/
+			var delta = f(N) - f(S);
+			
+			/* ∆ < 0: Há uma redução de energia, a qual implica que a nova solução é melhor que a anterior. O método aceita a solução e s’ passa a ser a nova solução corrente. */
+			if (delta < 0){ S = [...N]; Ss = true;}
+			
+			/* ∆ = 0: Caso de estabilidade, não havendo redução de energia. Na verdade, situação pouco provável de acontecer na prática. A aceitação da solução é, portanto, indiferente. */
+			if (delta == 0){ S = [...N]; Ss = true;}
+			
+			/* ∆ > 0: Houve um aumento do estado de energia. A aceitação desse tipo de solução é mais provável a altas temperaturas e bastante improvável a temperaturas reduzidas. 
+				Para reproduzir essas características, geralmente usa-se, para calcular a probabilidade de se aceitar a nova solução, uma função conhecida por fator de Boltzmann, 
+				que é dada por e^(-∆/T), onde T é um parâmetro do método, chamado de temperatura e que regula a probabilidade de soluções com pior custo. 
+				Por exemplo, esta poderá ser:
+					- Gera-se um número aleatório retirado de uma distribuição uniforme no intervalo [0, 1].
+					- Se este número for menor ou igual a “p”, aceita-se a solução. 
+					- Se for maior que “p”, rejeita-se a solução.
+			*/	
+			if (delta > 0 && Math.random() <= Math.pow(1, (delta * -1)/ T)){ S = [...N]; Ss = true;}		
+			
+			/* Testa se é o melhor caso o último vizinho */
+			if (Ss && f(S) < f(M)){ M = [...S];	}				
+		
+			if (Ss) equilibrio++;
+		}
+		
+		T -= (fatorResfriamento * T);
+		
+		tempo = (new Date().getTime() - start) / 1000;
+		
+	} while(tempo <= TEMPO && T > 0)
+	
+	return M;
+}
+
+function iniciarBusca(){	
+	var S = [rand(),rand(),rand(),rand()];
+	var T = document.getElementById("T").value;
+	var fatorResfriamento = document.getElementById("fatorResfriamento").value;
+	var equilibrioT = document.getElementById("equilibrioT").value;
+	var TEMPO = document.getElementById("TEMPO").value;
+	
+	var M = temperaSimulada(S, T, fatorResfriamento, equilibrioT, TEMPO);	
+	document.getElementById("melhor").innerHTML = '<b>x1:</b>'+M[0]+'<br/><b>x2:</b>'+M[1]+'<br/><b>x3:</b>'+M[2]+'<br/><b>x4:</b>'+M[3]+' '+"<br><b>Resultado:</b>"+f(M);
+}
+</script>
+<style>
+.bd-callout-warning{
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid #e9ecef;
+    border-left-width: .25rem;
+    border-radius: .25rem;
+	border-left-color: #f0ad4e;
+}
+</style>
+
+</head>
+<body>
+<div class="container">
+	<div class="row">
+		<div class="col bd-callout-warning">			
+			<h5 id="associating-form-text-with-form-controls">Tempera Simulada (Simulated annealing)</h5>
+			<p>Uma das principais vantagens deste algoritmo é permitir testar soluções mais distantes da solução inicial e possibilitar exploração de pontos distantes ao ponto inicial da pesquisa.</p>		
+		</div>
+	</div>
+	<div class="row">
+		<div class="col border border border-light p-3">
+			<form>
+			  <div class="mb-3">
+				<label for="T" class="form-label">Valor inicial da tempera</label>
+				<input type="text" class="form-control" id="T" value="1">				
+			  </div>
+			  
+			  <div class="mb-3">
+				<label for="fatorResfriamento" class="form-label">Factor de redução da temperatura</label>
+				<input type="text" class="form-control" id="fatorResfriamento" value="0.0000005">				
+			  </div>
+			  
+			  <div class="mb-3">
+				<label for="equilibrioT" class="form-label">Nr. de interações para o sistema atingir o equilíbrio térmico da tempera</label>
+				<input type="text" class="form-control" id="equilibrioT" value="50">				
+			  </div>
+			  
+			  <div class="mb-3">
+				<label for="TEMPO" class="form-label">Tempo máximo de execução do algoritmo em segundos</label>
+				<input type="text" class="form-control" id="TEMPO" value="5">
+			  </div>
+			  
+			  <button type="button" class="btn btn-primary" onclick="iniciarBusca()">Iniciar Busca</button>
+			</form>
+		</div>
+		<div class="col bg-light text-dark border border-light p-3">
+			<h5>Resultado da busca</h5>
+			<div id="melhor"></div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
