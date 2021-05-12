@@ -30,3 +30,7 @@ Se*  for maior que “p”, rejeita-se a solução.
 A temperatura T assume inicialmente um valor elevado, T0. Após um número fixo de iterações (o qual representa o número de iterações para o sistema atingir o equilíbrio térmico em uma dada temperatura), a temperatura é gradativamente diminuída por uma razão de resfriamento α, tal que Tn ← α * Tn -1, sendo 0 < α < 1. Como esse procedimento se dá no início, há uma chance maior de se escapar de mínimos locais e, à medida que T se aproxima de zero, o algoritmo se comporta como o método de descida, uma vez que diminui a probabilidade de se aceitar movimentos que possa piorar (T → 0 => e-∆/T → 0).
 
 O procedimento é finalizado quando a temperatura chega a um valor próximo de zero e nenhuma solução que piore o valor da melhor solução seja mais aceita, ou seja, quando o sistema estiver estável. A solução é obtida quando o sistema encontra-se nesta situação evidenciando o encontro de um mínimo local.
+
+## Teste
+
+https://samuel-troina.github.io/simulated-annealing/
