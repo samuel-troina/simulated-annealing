@@ -37,20 +37,23 @@ function rand(){
     return randomIntFromInterval(min, max, randomIntFromInterval(0, 10, 0));
 }
 
-/* S = Solução inicial */
-/* T = Valor inicial da tempera */
-/* fatorResfriamento = Fator de resfriamento da tempera valor entre 0 e 1 */
-/* equilibrioT = Nr. de interações para o sistema atingir o equilíbrio térmico da tempera */
-/* TEMPO = Tempo máximo de execução do algoritmo em segundos */
+/* 
+S = Solução inicial 
+T = Valor inicial da tempera 
+fatorResfriamento = Fator de resfriamento da tempera valor entre 0 e 1 
+equilibrioT = Nr. de interações para o sistema atingir o equilíbrio térmico da tempera
+TEMPO = Tempo máximo de execução do algoritmo em segundos 
+*/
 function temperaSimulada(S, T, fatorResfriamento, equilibrioT, TEMPO){
 	/* Ótimo Local/Global */
 	var M = [...S];
 
 	var start = new Date().getTime();
+
 	do {	
 		var equilibrio = 0;			
 		while(equilibrio < equilibrioT){	
-			var Ss = false, N = [...S];			
+			var nS = null, N = [...S];			
 			
 			/* Gera um vizinho */ 	
 			N[randomIntFromInterval(0,(S.length - 1),0)] = rand();
@@ -59,10 +62,10 @@ function temperaSimulada(S, T, fatorResfriamento, equilibrioT, TEMPO){
 			var delta = f(N) - f(S);
 			
 			/* ∆ < 0: Há uma redução de energia, a qual implica que a nova solução é melhor que a anterior. O método aceita a solução e s’ passa a ser a nova solução corrente. */
-			if (delta < 0){ S = [...N]; Ss = true;}
+			if (delta < 0){ nS = [...N]; }
 			
 			/* ∆ = 0: Caso de estabilidade, não havendo redução de energia. Na verdade, situação pouco provável de acontecer na prática. A aceitação da solução é, portanto, indiferente. */
-			if (delta == 0){ S = [...N]; Ss = true;}
+			if (delta == 0){ nS = [...N]; }
 			
 			/* ∆ > 0: Houve um aumento do estado de energia. A aceitação desse tipo de solução é mais provável a altas temperaturas e bastante improvável a temperaturas reduzidas. 
 				Para reproduzir essas características, geralmente usa-se, para calcular a probabilidade de se aceitar a nova solução, uma função conhecida por fator de Boltzmann, 
@@ -72,14 +75,19 @@ function temperaSimulada(S, T, fatorResfriamento, equilibrioT, TEMPO){
 					- Se este número for menor ou igual a “p”, aceita-se a solução. 
 					- Se for maior que “p”, rejeita-se a solução.
 			*/	
-			if (delta > 0 && Math.random() <= Math.pow(1, (delta * -1)/ T)){ S = [...N]; Ss = true;}		
+			if (delta > 0 && Math.random() <= Math.pow(1, (delta * -1)/ T)){ nS = [...N]; }		
 			
-			/* Testa se é o melhor caso o último vizinho */
-			if (Ss && f(S) < f(M)){ M = [...S];	}				
-		
-			if (Ss) equilibrio++;
+			if (nS) { 
+				S = [...nS];
+				
+				/* Testa se é o melhor caso o último vizinho */
+				if (f(S) < f(M)){ M = [...S]; }
+
+				equilibrio++;
+			}
 		}
 		
+		/* reduz a temperatura baseado no fator de resfriamento */
 		T -= (fatorResfriamento * T);
 		
 		tempo = (new Date().getTime() - start) / 1000;
