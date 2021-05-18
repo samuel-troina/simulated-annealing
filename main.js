@@ -1,4 +1,4 @@
-/* Valores mÌnimos e m·ximos aceitos para os elementos */
+/* Valores m√≠nimos e m√°ximos aceitos para os elementos */
 var min = -10, max = 10, decimais=10;
 
 function fx(x){

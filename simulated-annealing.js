@@ -1,16 +1,16 @@
 /* 
-	S = Solução inicial 
+	S = SoluÃ§Ã£o inicial 
 	T = Valor inicial da tempera 
 	fatorResfriamento = Fator de resfriamento da tempera valor entre 0 e 1 
-	equilibrioT = Nr. de interações para o sistema atingir o equilíbrio térmico da tempera
-	TEMPO = Tempo máximo de execução do algoritmo em segundos 
-	f = função a ser minimizada
-    fv = função responsável por gerar o proximo vizinho
+	equilibrioT = Nr. de interaÃ§Ãµes para o sistema atingir o equilÃ­brio tÃ©rmico da tempera
+	TEMPO = Tempo mÃ¡ximo de execuÃ§Ã£o do algoritmo em segundos 
+	f = funÃ§Ã£o a ser minimizada
+    fv = funÃ§Ã£o responsÃ¡vel por gerar o proximo vizinho
 */
 var TemperaSimulada = {
 
 	buscar : function (S, T, fatorResfriamento, equilibrioT, TEMPO, f, fv){
-		/* Ótimo Local/Global */
+		/* Ã“timo Local/Global */
 		var M = [...S], N = [];        
 
 		var start = new Date().getTime();
@@ -23,29 +23,29 @@ var TemperaSimulada = {
 				/* Gera um vizinho */ 	
 				N = fv(S);
 				
-				/*A cada geração de um novo vizinho s? de s, é testada a variação ? do valor da função objetivo, isto é, ? = f (s?) ? f (s), onde temos as seguintes situações:*/
+				/*A cada geraÃ§Ã£o de um novo vizinho s? de s, Ã© testada a variaÃ§Ã£o ? do valor da funÃ§Ã£o objetivo, isto Ã©, ? = f (s?) ? f (s), onde temos as seguintes situaÃ§Ãµes:*/
 				var delta = f(N) - f(S);
 				
-				/* ? < 0: Há uma redução de energia, a qual implica que a nova solução é melhor que a anterior. O método aceita a solução e s? passa a ser a nova solução corrente. */
+				/* Î” < 0: HÃ¡ uma reduÃ§Ã£o de energia, a qual implica que a nova soluÃ§Ã£o Ã© melhor que a anterior. O mÃ©todo aceita a soluÃ§Ã£o e s? passa a ser a nova soluÃ§Ã£o corrente. */
 				if (delta < 0){ nS = [...N]; }
 				
-				/* ? = 0: Caso de estabilidade, não havendo redução de energia. Na verdade, situação pouco provável de acontecer na prática. A aceitação da solução é, portanto, indiferente. */
+				/* Î” = 0: Caso de estabilidade, nÃ£o havendo reduÃ§Ã£o de energia. Na verdade, situaÃ§Ã£o pouco provÃ¡vel de acontecer na prÃ¡tica. A aceitaÃ§Ã£o da soluÃ§Ã£o Ã©, portanto, indiferente. */
 				if (delta == 0){ nS = [...N]; }
 				
-				/* ? > 0: Houve um aumento do estado de energia. A aceitação desse tipo de solução é mais provável a altas temperaturas e bastante improvável a temperaturas reduzidas. 
-					Para reproduzir essas características, geralmente usa-se, para calcular a probabilidade de se aceitar a nova solução, uma função conhecida por fator de Boltzmann, 
-					que é dada por e^(-?/T), onde T é um parâmetro do método, chamado de temperatura e que regula a probabilidade de soluções com pior custo. 
-					Por exemplo, esta poderá ser:
-						- Gera-se um número aleatório retirado de uma distribuição uniforme no intervalo [0, 1].
-						- Se este número for menor ou igual a ?p?, aceita-se a solução. 
-						- Se for maior que ?p?, rejeita-se a solução.
+				/* Î” > 0: Houve um aumento do estado de energia. A aceitaÃ§Ã£o desse tipo de soluÃ§Ã£o Ã© mais provÃ¡vel a altas temperaturas e bastante improvÃ¡vel a temperaturas reduzidas. 
+					Para reproduzir essas caracterÃ­sticas, geralmente usa-se, para calcular a probabilidade de se aceitar a nova soluÃ§Ã£o, uma funÃ§Ã£o conhecida por fator de Boltzmann, 
+					que Ã© dada por e^(-Î”/T), onde T Ã© um parÃ¢metro do mÃ©todo, chamado de temperatura e que regula a probabilidade de soluÃ§Ãµes com pior custo. 
+					Por exemplo, esta poderÃ¡ ser:
+						- Gera-se um nÃºmero aleatÃ³rio retirado de uma distribuiÃ§Ã£o uniforme no intervalo [0, 1].
+						- Se este nÃºmero for menor ou igual a "p", aceita-se a soluÃ§Ã£o. 
+						- Se for maior que "p", rejeita-se a soluÃ§Ã£o.
 				*/	
 				if (delta > 0 && Math.random() <= Math.pow(1, (delta * -1)/ T)){ nS = [...N]; }		
 				
 				if (nS) { 
 					S = [...nS];
 					
-					/* Testa se é o melhor caso o último vizinho */
+					/* Testa se Ã© o melhor caso o Ãºltimo vizinho */
 					if (f(S) < f(M)){ M = [...S]; }
 
 					equilibrio++;
@@ -53,7 +53,7 @@ var TemperaSimulada = {
 			}
 			
 			/* reduz a temperatura baseado no fator de resfriamento */
-			T -= (fatorResfriamento * T);
+			T -= fatorResfriamento;
 			
 			tempo = (new Date().getTime() - start) / 1000;
 			
