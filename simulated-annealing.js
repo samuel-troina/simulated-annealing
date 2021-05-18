@@ -23,10 +23,10 @@ var TemperaSimulada = {
 				/* Gera um vizinho */ 	
 				N = fv(S);
 				
-				/*A cada geração de um novo vizinho s? de s, é testada a variação ? do valor da função objetivo, isto é, ? = f (s?) ? f (s), onde temos as seguintes situações:*/
+				/*A cada geração de um novo vizinho s' de s, é testada a variação Δ do valor da função objetivo, isto é, Δ = f (s') ? f (s), onde temos as seguintes situações:*/
 				var delta = f(N) - f(S);
 				
-				/* Δ < 0: Há uma redução de energia, a qual implica que a nova solução é melhor que a anterior. O método aceita a solução e s? passa a ser a nova solução corrente. */
+				/* Δ < 0: Há uma redução de energia, a qual implica que a nova solução é melhor que a anterior. O método aceita a solução e s' passa a ser a nova solução corrente. */
 				if (delta < 0){ nS = [...N]; }
 				
 				/* Δ = 0: Caso de estabilidade, não havendo redução de energia. Na verdade, situação pouco provável de acontecer na prática. A aceitação da solução é, portanto, indiferente. */
